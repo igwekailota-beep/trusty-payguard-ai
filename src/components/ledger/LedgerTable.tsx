@@ -245,9 +245,8 @@ export function LedgerTable() {
               const high = row.original.riskScore >= 70;
               const isExpanded = expanded === row.original.id;
               return (
-                <>
+                <Fragment key={row.id}>
                   <tr
-                    key={row.id}
                     className={cn(
                       "border-t transition-colors",
                       high ? "bg-[color-mix(in_oklab,var(--risk-high)_8%,transparent)]" : "hover:bg-muted/40",
@@ -266,7 +265,7 @@ export function LedgerTable() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               );
             })}
             {table.getRowModel().rows.length === 0 && (
