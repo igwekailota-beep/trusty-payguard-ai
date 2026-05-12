@@ -1,4 +1,11 @@
-// Deterministic mock employee dataset for the Smart Decision Ledger.
+// Deterministic mock dataset for the Smart Decision Ledger.
+import {
+  calcScore,
+  statusFromScore,
+  type VerificationChecks,
+  type VerificationStatus,
+} from "./scoring";
+
 export type FlagReason =
   | "Clean"
   | "Shared Account"
@@ -11,10 +18,12 @@ export type SquadStatus = "RELEASED" | "HELD" | "BLOCKED";
 export interface Employee {
   id: string;
   name: string;
+  nin: string;
   bvn: string;
   department: string;
   salary: number;
   account: string;
+  // legacy risk metrics (kept for existing UI)
   riskScore: number;
   flagReason: FlagReason;
   squadStatus: SquadStatus;
@@ -22,13 +31,17 @@ export interface Employee {
   evidence: string[];
   accountAgeDays: number;
   prevSalary: number;
+  // new verification engine
+  checks: VerificationChecks;
+  trustScore: number;
+  verificationStatus: VerificationStatus;
+  hasSubmittedDocs: boolean;
 }
 
 const FIRST = ["Adaeze","Chinedu","Tunde","Ifeoma","Bola","Kemi","Sade","Emeka","Yusuf","Aisha","Folake","Obinna","Hauwa","Segun","Ngozi","Musa","Tope","Ebere","Ahmed","Ronke","Femi","Halima","Chukwu","Bisi","Idris","Nneka","Lekan","Zainab","Uche","Damilola"];
 const LAST = ["Okafor","Adeyemi","Ibrahim","Eze","Bello","Adekunle","Mohammed","Nwosu","Ogundimu","Lawal","Okonkwo","Hassan","Adebayo","Yakubu","Onyeka","Sani","Okeke","Garba"];
 const DEPTS = ["Education","Health","Works","Finance","Agriculture","Transport","Justice","Secretariat"];
 
-// simple seeded rng
 function mulberry32(seed: number) {
   return function () {
     let t = (seed += 0x6d2b79f5);
@@ -38,16 +51,15 @@ function mulberry32(seed: number) {
   };
 }
 
-function deriveStatus(score: number, flag: FlagReason): SquadStatus {
-  if (flag === "Clean" && score < 30) return "RELEASED";
-  if (score >= 70) return "BLOCKED";
+function squadFromStatus(v: VerificationStatus): SquadStatus {
+  if (v === "verified") return "RELEASED";
+  if (v === "rejected") return "BLOCKED";
   return "HELD";
 }
 
 export function generateEmployees(count = 220): Employee[] {
   const rnd = mulberry32(42);
   const list: Employee[] = [];
-  // Pre-seed a shared account ring (4 employees)
   const sharedAccount = "0123456789";
 
   for (let i = 0; i < count; i++) {
@@ -62,13 +74,24 @@ export function generateEmployees(count = 220): Employee[] {
     let account = String(1000000000 + Math.floor(rnd() * 8_999_999_999));
     let accountAgeDays = 30 + Math.floor(rnd() * 1500);
     let prevSalary = salary;
-    let score = Math.floor(rnd() * 28);
+
+    // Default to a "good" worker
+    let checks: VerificationChecks = {
+      ninVerified: true,
+      nameMatch: true,
+      statementValid: true,
+      screenshotMatch: true,
+      receiptMatch: true,
+      txnRefValid: true,
+    };
+    let hasSubmittedDocs = true;
 
     const r = rnd();
     if (i < 4) {
+      // Shared Account ring → rejected
       flag = "Shared Account";
       account = sharedAccount;
-      score = 78 + Math.floor(rnd() * 18);
+      checks = { ninVerified: false, nameMatch: false, statementValid: true, screenshotMatch: false, receiptMatch: false, txnRefValid: false };
       evidence = [
         `Account ${sharedAccount} linked to 4 distinct employee records`,
         `TX-IDs: TX-${1000 + i}, TX-${2000 + i}`,
@@ -77,7 +100,7 @@ export function generateEmployees(count = 220): Employee[] {
     } else if (r < 0.06) {
       flag = "Payday Pop-up";
       accountAgeDays = Math.floor(rnd() * 2);
-      score = 72 + Math.floor(rnd() * 20);
+      checks = { ninVerified: true, nameMatch: false, statementValid: false, screenshotMatch: false, receiptMatch: true, txnRefValid: false };
       evidence = [
         `Account opened ${accountAgeDays * 24}h before payroll cycle`,
         "No prior transaction history on bank statement",
@@ -87,38 +110,52 @@ export function generateEmployees(count = 220): Employee[] {
       flag = "Ghost Jump";
       prevSalary = Math.round(salary * (0.5 + rnd() * 0.2));
       const jump = ((salary - prevSalary) / prevSalary) * 100;
-      score = 65 + Math.floor(rnd() * 25);
+      // Score in flagged band (50-79): drop name + screenshot + receipt
+      checks = { ninVerified: true, nameMatch: true, statementValid: true, screenshotMatch: false, receiptMatch: false, txnRefValid: false };
       evidence = [
         `Salary increased ${jump.toFixed(1)}% in one cycle`,
         "No promotion record found in HR ledger",
         `Previous: ₦${prevSalary.toLocaleString()} → Current: ₦${salary.toLocaleString()}`,
       ];
-    } else if (r < 0.16) {
+    } else if (r < 0.18) {
       flag = "Velocity Flag";
-      score = 60 + Math.floor(rnd() * 28);
+      checks = { ninVerified: true, nameMatch: true, statementValid: true, screenshotMatch: true, receiptMatch: false, txnRefValid: false };
       evidence = [
         "Duplicate payment detected within current cycle",
         `TX-IDs: TX-${5000 + i}-A, TX-${5000 + i}-B`,
         "Same beneficiary, same amount, < 24h apart",
       ];
-    } else if (r < 0.32) {
-      score = 30 + Math.floor(rnd() * 25);
+    } else if (r < 0.26) {
+      // Pending — has not submitted docs yet
+      checks = { ninVerified: true, nameMatch: true, statementValid: false, screenshotMatch: false, receiptMatch: false, txnRefValid: false };
+      hasSubmittedDocs = false;
     }
+
+    const trustScore = calcScore(checks);
+    const verificationStatus = statusFromScore(trustScore, hasSubmittedDocs);
+    const squadStatus = squadFromStatus(verificationStatus);
+    // Map trust → legacy riskScore (inverse-ish, for old visualizations)
+    const riskScore = Math.round(((110 - trustScore) / 110) * 100);
 
     list.push({
       id: `EMP-${String(10000 + i)}`,
       name,
+      nin: `${10000000000 + Math.floor(rnd() * 89999999999)}`.slice(0, 11),
       bvn: `2${Math.floor(rnd() * 10_000_000_000)}`.slice(0, 11),
       department: dept,
       salary,
       account,
-      riskScore: score,
+      riskScore,
       flagReason: flag,
-      squadStatus: deriveStatus(score, flag),
+      squadStatus,
       override: false,
       evidence,
       accountAgeDays,
       prevSalary,
+      checks,
+      trustScore,
+      verificationStatus,
+      hasSubmittedDocs,
     });
   }
   return list;
