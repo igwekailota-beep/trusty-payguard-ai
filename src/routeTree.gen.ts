@@ -17,6 +17,10 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkerIndexRouteImport } from './routes/worker.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as WorkerHomeRouteImport } from './routes/worker.home'
+import { Route as WorkerDocumentsRouteImport } from './routes/worker.documents'
+import { Route as WorkerClaimRouteImport } from './routes/worker.claim'
+import { Route as WorkerAppealRouteImport } from './routes/worker.appeal'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
@@ -64,6 +68,26 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const WorkerHomeRoute = WorkerHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => WorkerRoute,
+} as any)
+const WorkerDocumentsRoute = WorkerDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => WorkerRoute,
+} as any)
+const WorkerClaimRoute = WorkerClaimRouteImport.update({
+  id: '/claim',
+  path: '/claim',
+  getParentRoute: () => WorkerRoute,
+} as any)
+const WorkerAppealRoute = WorkerAppealRouteImport.update({
+  id: '/appeal',
+  path: '/appeal',
+  getParentRoute: () => WorkerRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
@@ -115,6 +139,10 @@ export interface FileRoutesByFullPath {
   '/admin/wallet': typeof AdminWalletRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/worker/appeal': typeof WorkerAppealRoute
+  '/worker/claim': typeof WorkerClaimRoute
+  '/worker/documents': typeof WorkerDocumentsRoute
+  '/worker/home': typeof WorkerHomeRoute
   '/admin/': typeof AdminIndexRoute
   '/worker/': typeof WorkerIndexRoute
   '/admin/transaction-failed/$ref': typeof AdminTransactionFailedRefRoute
@@ -130,6 +158,10 @@ export interface FileRoutesByTo {
   '/admin/wallet': typeof AdminWalletRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/worker/appeal': typeof WorkerAppealRoute
+  '/worker/claim': typeof WorkerClaimRoute
+  '/worker/documents': typeof WorkerDocumentsRoute
+  '/worker/home': typeof WorkerHomeRoute
   '/admin': typeof AdminIndexRoute
   '/worker': typeof WorkerIndexRoute
   '/admin/transaction-failed/$ref': typeof AdminTransactionFailedRefRoute
@@ -148,6 +180,10 @@ export interface FileRoutesById {
   '/admin/wallet': typeof AdminWalletRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/worker/appeal': typeof WorkerAppealRoute
+  '/worker/claim': typeof WorkerClaimRoute
+  '/worker/documents': typeof WorkerDocumentsRoute
+  '/worker/home': typeof WorkerHomeRoute
   '/admin/': typeof AdminIndexRoute
   '/worker/': typeof WorkerIndexRoute
   '/admin/transaction-failed/$ref': typeof AdminTransactionFailedRefRoute
@@ -167,6 +203,10 @@ export interface FileRouteTypes {
     | '/admin/wallet'
     | '/auth/login'
     | '/auth/signup'
+    | '/worker/appeal'
+    | '/worker/claim'
+    | '/worker/documents'
+    | '/worker/home'
     | '/admin/'
     | '/worker/'
     | '/admin/transaction-failed/$ref'
@@ -182,6 +222,10 @@ export interface FileRouteTypes {
     | '/admin/wallet'
     | '/auth/login'
     | '/auth/signup'
+    | '/worker/appeal'
+    | '/worker/claim'
+    | '/worker/documents'
+    | '/worker/home'
     | '/admin'
     | '/worker'
     | '/admin/transaction-failed/$ref'
@@ -199,6 +243,10 @@ export interface FileRouteTypes {
     | '/admin/wallet'
     | '/auth/login'
     | '/auth/signup'
+    | '/worker/appeal'
+    | '/worker/claim'
+    | '/worker/documents'
+    | '/worker/home'
     | '/admin/'
     | '/worker/'
     | '/admin/transaction-failed/$ref'
@@ -273,6 +321,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/worker/home': {
+      id: '/worker/home'
+      path: '/home'
+      fullPath: '/worker/home'
+      preLoaderRoute: typeof WorkerHomeRouteImport
+      parentRoute: typeof WorkerRoute
+    }
+    '/worker/documents': {
+      id: '/worker/documents'
+      path: '/documents'
+      fullPath: '/worker/documents'
+      preLoaderRoute: typeof WorkerDocumentsRouteImport
+      parentRoute: typeof WorkerRoute
+    }
+    '/worker/claim': {
+      id: '/worker/claim'
+      path: '/claim'
+      fullPath: '/worker/claim'
+      preLoaderRoute: typeof WorkerClaimRouteImport
+      parentRoute: typeof WorkerRoute
+    }
+    '/worker/appeal': {
+      id: '/worker/appeal'
+      path: '/appeal'
+      fullPath: '/worker/appeal'
+      preLoaderRoute: typeof WorkerAppealRouteImport
+      parentRoute: typeof WorkerRoute
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/auth/signup'
@@ -346,10 +422,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface WorkerRouteChildren {
+  WorkerAppealRoute: typeof WorkerAppealRoute
+  WorkerClaimRoute: typeof WorkerClaimRoute
+  WorkerDocumentsRoute: typeof WorkerDocumentsRoute
+  WorkerHomeRoute: typeof WorkerHomeRoute
   WorkerIndexRoute: typeof WorkerIndexRoute
 }
 
 const WorkerRouteChildren: WorkerRouteChildren = {
+  WorkerAppealRoute: WorkerAppealRoute,
+  WorkerClaimRoute: WorkerClaimRoute,
+  WorkerDocumentsRoute: WorkerDocumentsRoute,
+  WorkerHomeRoute: WorkerHomeRoute,
   WorkerIndexRoute: WorkerIndexRoute,
 }
 
