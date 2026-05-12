@@ -19,6 +19,11 @@ import { Route as WorkerIndexRouteImport } from './routes/worker.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminBatchesRouteImport } from './routes/admin.batches'
+import { Route as AdminAppealsRouteImport } from './routes/admin.appeals'
+import { Route as AdminTransactionFailedRefRouteImport } from './routes/admin.transaction-failed.$ref'
 
 const WorkerRoute = WorkerRouteImport.update({
   id: '/worker',
@@ -70,6 +75,32 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminWalletRoute = AdminWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBatchesRoute = AdminBatchesRouteImport.update({
+  id: '/batches',
+  path: '/batches',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAppealsRoute = AdminAppealsRouteImport.update({
+  id: '/appeals',
+  path: '/appeals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTransactionFailedRefRoute =
+  AdminTransactionFailedRefRouteImport.update({
+    id: '/transaction-failed/$ref',
+    path: '/transaction-failed/$ref',
+    getParentRoute: () => AdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -78,20 +109,30 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/wizard': typeof WizardRoute
   '/worker': typeof WorkerRouteWithChildren
+  '/admin/appeals': typeof AdminAppealsRoute
+  '/admin/batches': typeof AdminBatchesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/worker/': typeof WorkerIndexRoute
+  '/admin/transaction-failed/$ref': typeof AdminTransactionFailedRefRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/audit': typeof AuditRoute
   '/dashboard': typeof DashboardRoute
   '/wizard': typeof WizardRoute
+  '/admin/appeals': typeof AdminAppealsRoute
+  '/admin/batches': typeof AdminBatchesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/admin': typeof AdminIndexRoute
   '/worker': typeof WorkerIndexRoute
+  '/admin/transaction-failed/$ref': typeof AdminTransactionFailedRefRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,10 +142,15 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/wizard': typeof WizardRoute
   '/worker': typeof WorkerRouteWithChildren
+  '/admin/appeals': typeof AdminAppealsRoute
+  '/admin/batches': typeof AdminBatchesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/admin/': typeof AdminIndexRoute
   '/worker/': typeof WorkerIndexRoute
+  '/admin/transaction-failed/$ref': typeof AdminTransactionFailedRefRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,20 +161,30 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/wizard'
     | '/worker'
+    | '/admin/appeals'
+    | '/admin/batches'
+    | '/admin/dashboard'
+    | '/admin/wallet'
     | '/auth/login'
     | '/auth/signup'
     | '/admin/'
     | '/worker/'
+    | '/admin/transaction-failed/$ref'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/audit'
     | '/dashboard'
     | '/wizard'
+    | '/admin/appeals'
+    | '/admin/batches'
+    | '/admin/dashboard'
+    | '/admin/wallet'
     | '/auth/login'
     | '/auth/signup'
     | '/admin'
     | '/worker'
+    | '/admin/transaction-failed/$ref'
   id:
     | '__root__'
     | '/'
@@ -137,10 +193,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/wizard'
     | '/worker'
+    | '/admin/appeals'
+    | '/admin/batches'
+    | '/admin/dashboard'
+    | '/admin/wallet'
     | '/auth/login'
     | '/auth/signup'
     | '/admin/'
     | '/worker/'
+    | '/admin/transaction-failed/$ref'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -226,15 +287,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/wallet': {
+      id: '/admin/wallet'
+      path: '/wallet'
+      fullPath: '/admin/wallet'
+      preLoaderRoute: typeof AdminWalletRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/batches': {
+      id: '/admin/batches'
+      path: '/batches'
+      fullPath: '/admin/batches'
+      preLoaderRoute: typeof AdminBatchesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/appeals': {
+      id: '/admin/appeals'
+      path: '/appeals'
+      fullPath: '/admin/appeals'
+      preLoaderRoute: typeof AdminAppealsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/transaction-failed/$ref': {
+      id: '/admin/transaction-failed/$ref'
+      path: '/transaction-failed/$ref'
+      fullPath: '/admin/transaction-failed/$ref'
+      preLoaderRoute: typeof AdminTransactionFailedRefRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAppealsRoute: typeof AdminAppealsRoute
+  AdminBatchesRoute: typeof AdminBatchesRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminWalletRoute: typeof AdminWalletRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminTransactionFailedRefRoute: typeof AdminTransactionFailedRefRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAppealsRoute: AdminAppealsRoute,
+  AdminBatchesRoute: AdminBatchesRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminWalletRoute: AdminWalletRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminTransactionFailedRefRoute: AdminTransactionFailedRefRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -263,3 +369,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
