@@ -1,7 +1,6 @@
-// Old /dashboard URL -> /admin/dashboard
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/admin/")({
   beforeLoad: () => {
     throw redirect({ to: "/admin/dashboard" });
   },

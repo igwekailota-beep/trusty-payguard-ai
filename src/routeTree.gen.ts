@@ -15,6 +15,8 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuditRouteImport } from './routes/audit'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkerIndexRouteImport } from './routes/worker.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 
@@ -48,6 +50,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkerIndexRoute = WorkerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkerRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
   path: '/auth/signup',
@@ -61,34 +73,38 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/audit': typeof AuditRoute
   '/dashboard': typeof DashboardRoute
   '/wizard': typeof WizardRoute
-  '/worker': typeof WorkerRoute
+  '/worker': typeof WorkerRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/admin/': typeof AdminIndexRoute
+  '/worker/': typeof WorkerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/audit': typeof AuditRoute
   '/dashboard': typeof DashboardRoute
   '/wizard': typeof WizardRoute
-  '/worker': typeof WorkerRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/admin': typeof AdminIndexRoute
+  '/worker': typeof WorkerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/audit': typeof AuditRoute
   '/dashboard': typeof DashboardRoute
   '/wizard': typeof WizardRoute
-  '/worker': typeof WorkerRoute
+  '/worker': typeof WorkerRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/admin/': typeof AdminIndexRoute
+  '/worker/': typeof WorkerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,16 +117,18 @@ export interface FileRouteTypes {
     | '/worker'
     | '/auth/login'
     | '/auth/signup'
+    | '/admin/'
+    | '/worker/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/audit'
     | '/dashboard'
     | '/wizard'
-    | '/worker'
     | '/auth/login'
     | '/auth/signup'
+    | '/admin'
+    | '/worker'
   id:
     | '__root__'
     | '/'
@@ -121,15 +139,17 @@ export interface FileRouteTypes {
     | '/worker'
     | '/auth/login'
     | '/auth/signup'
+    | '/admin/'
+    | '/worker/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuditRoute: typeof AuditRoute
   DashboardRoute: typeof DashboardRoute
   WizardRoute: typeof WizardRoute
-  WorkerRoute: typeof WorkerRoute
+  WorkerRoute: typeof WorkerRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
 }
@@ -178,6 +198,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/worker/': {
+      id: '/worker/'
+      path: '/'
+      fullPath: '/worker/'
+      preLoaderRoute: typeof WorkerIndexRouteImport
+      parentRoute: typeof WorkerRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/auth/signup'
@@ -195,13 +229,34 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface WorkerRouteChildren {
+  WorkerIndexRoute: typeof WorkerIndexRoute
+}
+
+const WorkerRouteChildren: WorkerRouteChildren = {
+  WorkerIndexRoute: WorkerIndexRoute,
+}
+
+const WorkerRouteWithChildren =
+  WorkerRoute._addFileChildren(WorkerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuditRoute: AuditRoute,
   DashboardRoute: DashboardRoute,
   WizardRoute: WizardRoute,
-  WorkerRoute: WorkerRoute,
+  WorkerRoute: WorkerRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
 }
