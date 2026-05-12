@@ -1,100 +1,85 @@
-# PayGuard AI — Smart Payroll Trust Infrastructure
+## PayGuard AI v2 — Dual-Portal Restructure (Frontend-only mock)
 
-A high-fidelity React frontend that turns payroll auditing into a guided, AI-gated workflow. Sold to **audit firms** who hold government contracts, demonstrating "Prevention over Detection" — the Squad Transfer API is programmatically locked behind the AI's verdict, so payroll fraud is stopped *before* money leaves the bank.
+Backend stays stubbed. All auth, data, uploads, and Squad calls live in Zustand stores with `localStorage` persistence so the demo survives refreshes.
 
-Built around the team's final pivot: **no biometrics**. The AI works exclusively on Bank Statement PDFs, Payroll CSVs, and Transaction IDs to surface ghost workers, shared accounts, payday-popup accounts, and suspicious salary jumps.
-
-## Design Language
-
-- Authoritative enterprise FinTech: deep navy/indigo primary, slate neutrals, crisp whites, success green, alert amber, fraud red.
-- All colors as semantic tokens in `src/styles.css` using `oklch` (no raw color classes in components).
-- Subtle motion: scan-line animations over document thumbnails, lock/unlock micro-interactions, skeleton loaders to imply "6 months in 6 seconds".
-- Lightweight, responsive layout suited to lower-bandwidth Nigerian context.
-
-## Routes (TanStack Start, file-based)
+### New routing
 
 ```
-src/routes/
-  __root.tsx              shared shell + nav + footer
-  index.tsx               landing: value prop + CTA into wizard
-  wizard.tsx              4-step Pre-Flight ingestion wizard
-  dashboard.tsx           Smart Decision Ledger (command center)
-  audit.tsx               Audit trail + printable compliance report
+/                       Landing — pick "I'm a Worker" or "I'm a Company"
+/auth/login             Tabbed Worker / Company login
+/auth/signup            Tabbed signup (worker fields vs company fields)
+
+/admin                  Layout (desktop, role-gated)
+  /admin/dashboard       Smart Decision Ledger (existing, refit to new schema)
+  /admin/batches         Payroll Batch Manager (Excel upload, status list)
+  /admin/wallet          Squad Wallet funding UI
+  /admin/appeals         Appeals Inbox
+  /admin/transaction-failed/$ref   Detailed failure help page
+
+/worker                 Layout (mobile-first, role-gated)
+  /worker/home           Status tracker (Pending / Verified / Flagged / Rejected + score)
+  /worker/claim          Claim-record wizard (NIN + Account #)
+  /worker/documents      Upload PDFs + screenshots
+  /worker/appeal         Appeal form (message + 1 supporting doc)
+
+/wizard, /audit         Kept, repositioned as admin tools
 ```
 
-Each route gets its own `head()` metadata (title, description, og tags).
+Existing `/dashboard` becomes `/admin/dashboard`; old `/wizard` and `/audit` move under `/admin`.For the worker's side of things, the mobile-first design doesn't necessarily mean that it won't be manifested as a desktop site but I'm just saying that they should also work on making it mobile-first as not all the workers may have access to laptops or computers.
 
-## Page 1 — Landing (`/`)
+### Mock auth + RBAC
 
-Hero "Stop payroll fraud before money leaves the bank.", trust stats, three pillar cards (Ingest → Analyze → Disburse), Squad-API-locked diagram, CTA → `/wizard`. Audience callout: built for audit firms partnering with state ministries and federal institutions.
+- `src/store/authStore.ts` (Zustand + persist): `user { id, role: 'worker'|'company_admin', ...profile }`, `signup`, `login`, `logout`.
+- `RequireRole` wrapper used inside `/admin` and `/worker` layout routes — redirects to `/auth/login` or the other portal's home if the role is wrong.
+- Landing page detects logged-in user and offers "Continue to your portal".
 
-## Page 2 — Pre-Flight Wizard (`/wizard`)
+### Scoring engine
 
-Sticky `StepperHeader` (Scope → Ingest → Analyze → Review). Persistent state via Zustand so steps survive navigation/refresh. Validation gates each step.
-
-- **Step 1 — Scope**: searchable Agency/Ministry select (Small Agency / State Ministry / Federal Institution presets matching the revenue model), payroll cycle, expected employee count.
-- **Step 2 — Ingestion**: two drag-and-drop zones — Bank Statements (PDFs) and Payroll CSV/XLSX. Mobile camera capture (`capture="environment"`) for scan-to-upload. Per-file status chips (Queued, Scanning, Extracted, Needs Re-scan) with immediate "Needs Re-scan" alerts on bad files.
-- **Step 3 — AI Analysis**: animated scan-line over document thumbnails, live checklist (Parsing PDFs → Matching BVN/NIN → Cross-referencing Transaction IDs → Detecting Smart Patterns) with a streaming Risk Confidence score. Cannot proceed until score returns.
-- **Step 4 — Review**: executive summary card (Total Payroll, Verified Amount, Potential Savings ₦), split buckets "Ready for Squad Disbursement" vs "Flagged for Manual Review", primary "Authorize Disbursement via Squad" button with a `LogicBadge` ("Squad API Locked. Reason: AI Risk Score > 70" when applicable).
-
-## Page 3 — Smart Decision Ledger (`/dashboard`)
-
-The core command center.
-
-- `FilterBar`: search, department, risk-level, Squad-status filters.
-- `LedgerTable` built on **TanStack Table** (sorting, filtering, pagination — handles 5k–20k rows from the revenue-model personas).
-  Columns: Employee (name + BVN/NIN verified chip), Department, Risk Score (0–100 with `RiskBadge` ring), Flag Reason, Squad Status (`SquadPaymentGate` lock icon: red BLOCKED, amber HELD, green RELEASED), Manual Override toggle.
-- Row expansion → **AI Evidence**: PDF snippet placeholder, mini `TransactionMap` (node graph showing employees sharing one account), conflicting transaction IDs.
-- Conditional row styling: soft red background for high-risk rows.
-- Sticky `FooterSummary`: Total Payroll · Flagged Savings · Verified count.
-- Primary CTA: "Execute Verified Payments via Squad" (only fires for cleared rows).
-- Right-side `RealTimeWebhookFeed`: live activity log (Transfer Released, Fraud Paused, Override Applied), simulating Squad webhooks.
-
-**Placeholder Red-Flag logic** (configurable later, pitched as "Configurable AI"):
-- Shared Account — multiple employees on same account
-- Payday Pop-up — account opened <48h before payroll
-- Ghost Jump — salary increase >20% with no promotion record
-- Velocity Flag — duplicate payment in same cycle
-
-## Page 4 — Audit Trail (`/audit`)
-
-Compliance report: summary stats, per-employee decision log, printable layout (`window.print()` styled), CSV export stub. Branded as "Payroll Compliance Report" deliverable for the government client.
-
-## Reusable Components
+`src/lib/scoring.ts` — pure function:
 
 ```
-src/components/
-  layout/        AppShell, Header, Footer
-  wizard/        StepperHeader, ScopeStep, IngestStep, AnalyzeStep, ReviewStep, UploadDropzone, ScanAnimation
-  ledger/        LedgerTable, RiskBadge, SquadPaymentGate, TransactionMap, RowEvidence, FooterSummary, FilterBar
-  feed/          RealTimeWebhookFeed
-  common/        StatCard, LogicBadge, SkeletonRow
+NIN verified            +25
+Name matches            +20
+Statement valid         +20
+Screenshot matched      +15
+Receipt matched         +15
+Transaction ref valid   +15
 ```
 
-## State & Mock Data
+Status mapping: `>=80 verified`, `50–79 flagged`, `<50 rejected`.
 
-- `src/store/wizardStore.ts` — Zustand for wizard progress + uploaded file metadata.
-- `src/store/ledgerStore.ts` — generated mock employees (~200 rows) seeded with all four red-flag patterns; deterministic so demo is repeatable.
-- `src/lib/mockSquad.ts` — simulated webhook events on an interval feeding the live activity sidebar.
+`ledgerStore` rows gain `checks: { ninVerified, nameMatch, statementValid, screenshotMatch, receiptMatch, txnRef }`, derived `score` and `verificationStatus`. Mock data seeded so all three buckets exist.
 
-No backend in this pass — Lovable Cloud and real Squad API wiring deferred to follow-up prompts.
+### Admin portal (desktop)
 
-## Technical Notes
+- **Batches**: drag-and-drop Excel zone (mock parse → fake batch row), status chips `pending → processing → funded → completed`.
+- **Wallet**: balance card + "Fund Wallet via Squad" form. ~15% chance the mock call fails → redirect to `/admin/transaction-failed/$ref` with code, reference, and troubleshooting list.
+- **Ledger refit**: new `Trust Breakdown` expansion showing the 6 checks as ✓/✗ chips, score bar, "Disburse via Squad" disabled unless `verified`, "Manual Review" modal for flagged rows where admin can tick missing checks to override and re-score.
+- **Appeals Inbox**: list of worker appeals with message + attached ID, Approve/Reject actions feeding back into the worker's status.
+- **FilterBar** gains a verification-status filter.
 
-- React 19 + TanStack Start + Tailwind v4 (already configured).
-- Add: `zustand`, `@tanstack/react-table`, `react-dropzone`. `lucide-react` already present.
-- New tokens in `src/styles.css`: `--risk-low`, `--risk-medium`, `--risk-high`, `--squad-locked`, `--squad-held`, `--squad-released`, `--surface-elevated`, gradient + shadow tokens for the trust-centric look.
-- Strict separation: presentation only; AI scoring + Squad calls stubbed behind clearly-named functions ready to swap for real integrations.
+### Worker portal (mobile-first)
 
-## Follow-Up Hooks (designed for iterative prompts)
+- **Home**: big status card (color-coded), score `xx/110`, next-step CTA.
+- **Claim wizard**: enter NIN (11 digits) + Account # (10 digits), validate, match against mock payroll → success or "Discrepancy Detected" screen with `Request Manual Appeal` button.
+- **Documents**: large touch targets, separate cards for Bank Statement PDF and Transaction Screenshot, animated "Score Tally" on submit (counts up the points awarded).
+- **Appeal form**: textarea + single supporting-document upload (e.g. National ID), submits to admin Appeals Inbox.
+- **Rejected lock state**: upload buttons disabled, only "Request Appeal" enabled.
 
-The architecture is intentionally modular so you can later say:
-- "Add a mobile camera scan modal in IngestStep."
-- "Tint LedgerTable rows red when Flag Reason = 'Shared Account'."
-- "Add an Audit Log entry on every Manual Override toggle."
-- "Add `/analytics` route with a Recharts bar chart of savings per ministry."
-- "Wire Lovable Cloud + real Squad Transfer API into mockSquad.ts."
+### Shared
 
-## Out of Scope (this pass)
+- `src/components/common/StatusPill.tsx` — semantic colors (green/yellow/red/grey) reused everywhere.
+- `src/components/common/ScoreBreakdown.tsx` — used in admin Manual Review modal and worker tally.
+- `RealTimeWebhookFeed` already exists — reused on admin dashboard; add toast bridge so successes/failures also fire `sonner` toasts.
+- New tokens in `src/styles.css`: `--status-verified`, `--status-pending`, `--status-flagged`, `--status-rejected` (semantic, on top of existing risk tokens).
 
-Real backend, auth, database, real Squad API calls, real PDF OCR — all stubbed with realistic deterministic mocks for the demo.
+### State files
+
+- `src/store/authStore.ts` — mock auth.
+- `src/store/batchStore.ts` — payroll batches + wallet balance + transaction failures.
+- `src/store/appealStore.ts` — appeals queue.
+- Existing `wizardStore`, `ledgerStore`, `feedStore` kept; ledgerStore gains the new check fields and score derivation.
+
+### Out of scope (this pass)
+
+Real Supabase Auth, real RLS, real Excel parsing, real Squad API, real OCR. All are stubbed behind clearly-named functions ready to swap in a follow-up "wire Lovable Cloud" prompt.

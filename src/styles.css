@@ -36,6 +36,10 @@
   --color-squad-locked: var(--squad-locked);
   --color-squad-held: var(--squad-held);
   --color-squad-released: var(--squad-released);
+  --color-status-verified: var(--status-verified);
+  --color-status-pending: var(--status-pending);
+  --color-status-flagged: var(--status-flagged);
+  --color-status-rejected: var(--status-rejected);
 }
 
 :root {
@@ -72,6 +76,12 @@
   --squad-locked: oklch(0.6 0.22 25);
   --squad-held: oklch(0.74 0.16 75);
   --squad-released: oklch(0.62 0.16 150);
+
+  /* Verification status */
+  --status-verified: oklch(0.62 0.16 150);
+  --status-pending: oklch(0.62 0.05 250);
+  --status-flagged: oklch(0.74 0.16 75);
+  --status-rejected: oklch(0.6 0.22 25);
 
   /* Gradients & shadows */
   --gradient-primary: linear-gradient(135deg, oklch(0.32 0.12 264), oklch(0.45 0.15 260));
