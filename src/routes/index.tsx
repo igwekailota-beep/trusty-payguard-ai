@@ -1,19 +1,8 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Building2, Lock, ShieldCheck, Smartphone, Sparkles, UserRound, Wallet } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "PayGuard AI — Smart Payroll Trust" },
-      { name: "description", content: "Dual-portal payroll trust system. AI-gated Squad disbursement for Nigerian companies and verified workers." },
-      { property: "og:title", content: "PayGuard AI" },
-      { property: "og:description", content: "Stop payroll fraud before money leaves the bank." },
-    ],
-  }),
-  component: Landing,
-});
 
 function Landing() {
   const user = useAuthStore((s) => s.user);
@@ -203,3 +192,5 @@ function Bucket({ color, range, label, desc }: { color: string; range: string; l
     </div>
   );
 }
+
+export default Landing;

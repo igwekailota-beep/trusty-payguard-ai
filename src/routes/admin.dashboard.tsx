@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { LedgerTable } from "@/components/ledger/LedgerTable";
 import { RealTimeWebhookFeed } from "@/components/feed/RealTimeWebhookFeed";
 import { useLedgerStore } from "@/store/ledgerStore";
@@ -6,15 +6,6 @@ import { StatCard } from "@/components/common/StatCard";
 import { naira, compactNaira } from "@/lib/format";
 import { ShieldAlert, ShieldCheck, Users, Wallet } from "lucide-react";
 
-export const Route = createFileRoute("/admin/dashboard")({
-  head: () => ({
-    meta: [
-      { title: "Smart Decision Ledger · PayGuard Admin" },
-      { name: "description", content: "AI-gated payroll command center with live Squad webhook feed." },
-    ],
-  }),
-  component: AdminDashboard,
-});
 
 function AdminDashboard() {
   const employees = useLedgerStore((s) => s.employees);
@@ -49,3 +40,5 @@ function AdminDashboard() {
     </div>
   );
 }
+
+export default AdminDashboard;

@@ -1,7 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "comment": "Placeholder for future SPA conversion. The current app is TanStack Start on Cloudflare Workers and is NOT yet Vercel-compatible. After ripping out the SSR adapter, this file will provide the SPA fallback.",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

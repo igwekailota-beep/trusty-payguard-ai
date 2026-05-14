@@ -1,20 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { useLedgerStore } from "@/store/ledgerStore";
 import { Button } from "@/components/ui/button";
 import { compactNaira, naira } from "@/lib/format";
 import { Download, Printer, ShieldCheck } from "lucide-react";
 import { SquadPaymentGate } from "@/components/ledger/SquadPaymentGate";
 
-export const Route = createFileRoute("/audit")({
-  head: () => ({
-    meta: [
-      { title: "Payroll Compliance Report · PayGuard AI" },
-      { name: "description", content: "Printable audit trail and compliance report for government clients." },
-      { property: "og:title", content: "PayGuard AI · Audit Trail" },
-    ],
-  }),
-  component: AuditPage,
-});
 
 function AuditPage() {
   const employees = useLedgerStore((s) => s.employees);
@@ -136,3 +126,5 @@ function Field({ label, value, sub }: { label: string; value: string; sub?: stri
     </div>
   );
 }
+
+export default AuditPage;

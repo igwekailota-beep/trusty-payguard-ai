@@ -1,7 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/worker/")({
-  beforeLoad: () => {
-    throw redirect({ to: "/worker/home" });
-  },
-});
+import { Navigate } from "react-router-dom";
+export default function WorkerIndex() {
+  return <Navigate to="/worker/home" replace />;
+}

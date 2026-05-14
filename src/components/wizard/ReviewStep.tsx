@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useWizardStore } from "@/store/wizardStore";
 import { useLedgerStore } from "@/store/ledgerStore";
 import { useFeedStore } from "@/store/feedStore";
@@ -29,7 +29,7 @@ export function ReviewStep() {
       message: `Squad batch executed for ${agency || "audit run"} · ${n} transfers released`,
     });
     reset();
-    navigate({ to: "/dashboard" });
+    navigate("/dashboard");
   };
 
   return (

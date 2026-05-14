@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
@@ -11,10 +11,6 @@ import { FileText, ImageIcon, Lock, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { calcScore, statusFromScore, MAX_SCORE, type VerificationChecks } from "@/lib/scoring";
 
-export const Route = createFileRoute("/worker/documents")({
-  head: () => ({ meta: [{ title: "My Documents · PayGuard Worker" }] }),
-  component: DocumentsPage,
-});
 
 function DocumentsPage() {
   const user = useAuthStore((s) => s.user);
@@ -167,3 +163,5 @@ function DocCard({
     </button>
   );
 }
+
+export default DocumentsPage;

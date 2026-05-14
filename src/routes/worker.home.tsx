@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { useLedgerStore } from "@/store/ledgerStore";
 import { useAppealStore } from "@/store/appealStore";
@@ -9,10 +9,6 @@ import { naira } from "@/lib/format";
 import { STATUS_META, MAX_SCORE } from "@/lib/scoring";
 import { ArrowRight, FileSearch, Upload, MessageSquareWarning } from "lucide-react";
 
-export const Route = createFileRoute("/worker/home")({
-  head: () => ({ meta: [{ title: "My Status · PayGuard Worker" }] }),
-  component: WorkerHome,
-});
 
 function WorkerHome() {
   const user = useAuthStore((s) => s.user);
@@ -152,3 +148,5 @@ function ActionCard({ icon, title, body, href, cta, tone }: { icon: React.ReactN
     </Link>
   );
 }
+
+export default WorkerHome;

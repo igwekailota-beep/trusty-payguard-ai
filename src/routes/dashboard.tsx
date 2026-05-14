@@ -1,8 +1,4 @@
-// Old /dashboard URL -> /admin/dashboard
-import { createFileRoute, redirect } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/dashboard")({
-  beforeLoad: () => {
-    throw redirect({ to: "/admin/dashboard" });
-  },
-});
+import { Navigate } from "react-router-dom";
+export default function DashboardRedirect() {
+  return <Navigate to="/admin/dashboard" replace />;
+}

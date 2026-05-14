@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LogOut, ShieldCheck, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
@@ -81,7 +81,7 @@ export function Header() {
                 aria-label="Sign out"
                 onClick={() => {
                   logout();
-                  navigate({ to: "/" });
+                  navigate("/");
                 }}
               >
                 <LogOut className="h-4 w-4" />
