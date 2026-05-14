@@ -28,7 +28,7 @@ function WalletPage() {
       if (!result.ok) {
         pushFeed({ kind: "blocked", message: `Squad funding failed · ${result.failure.code}` });
         toast.error(`Squad funding failed · ${result.failure.code}`);
-        navigate({ to: "/admin/transaction-failed/$ref", params: { ref: result.failure.ref } });
+        navigate(`/admin/transaction-failed/${result.failure.ref}`);
         return;
       }
       pushFeed({ kind: "released", message: `Wallet funded · ${naira(value)}` });
