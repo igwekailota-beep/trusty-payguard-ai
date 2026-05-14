@@ -21,7 +21,7 @@ function LoginPage() {
     }
     login(email, role);
     toast.success(`Signed in as ${role === "worker" ? "Worker" : "Company Admin"}`);
-    navigate({ to: role === "worker" ? "/worker/home" : "/admin/dashboard" });
+    navigate(role === "worker" ? "/worker/home" : "/admin/dashboard");
   };
 
   return (
