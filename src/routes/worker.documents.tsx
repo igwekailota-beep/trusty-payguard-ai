@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { useLedgerStore } from "@/store/ledgerStore";
 import { useFeedStore } from "@/store/feedStore";
+import { workerService } from "@/services/api";
 import { ScoreBreakdown } from "@/components/common/ScoreBreakdown";
 import { StatusPill } from "@/components/common/StatusPill";
 import { FileText, ImageIcon, Lock, Upload } from "lucide-react";
@@ -18,7 +19,6 @@ export const Route = createFileRoute("/worker/documents")({
 function DocumentsPage() {
   const user = useAuthStore((s) => s.user);
   const employee = user?.matchedEmployeeId ? useLedgerStore((s) => s.employees.find((e) => e.id === user.matchedEmployeeId)) : undefined;
-  const submitDocs = useLedgerStore((s) => s.submitDocs);
   const pushFeed = useFeedStore((s) => s.push);
 
   const [statementFile, setStatementFile] = useState<File | null>(null);
@@ -49,8 +49,8 @@ function DocumentsPage() {
       txnRefValid: !!statementFile && !!screenshotFile,
     };
     const finalScore = calcScore(newChecks);
-    runTally(finalScore, () => {
-      submitDocs(employee.id, newChecks);
+    runTally(finalScore, async () => {
+      await workerService.submitDocuments(employee.id, newChecks);
       pushFeed({ kind: "info", message: `Worker submitted documents · ${employee.id} · score ${finalScore}` });
       const status = statusFromScore(finalScore, true);
       if (status === "verified") toast.success(`Verified! Trust score ${finalScore}/${MAX_SCORE}`);
