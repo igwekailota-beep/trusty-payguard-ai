@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useBatchStore } from "@/store/batchStore";
 import { useFeedStore } from "@/store/feedStore";
+import { companyService } from "@/services/api";
 import { compactNaira, naira } from "@/lib/format";
 import { Wallet, ArrowUpRight, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -16,25 +17,30 @@ export const Route = createFileRoute("/admin/wallet")({
 
 function WalletPage() {
   const balance = useBatchStore((s) => s.walletBalance);
-  const fund = useBatchStore((s) => s.fundWallet);
   const failures = useBatchStore((s) => s.failures);
   const pushFeed = useFeedStore((s) => s.push);
   const navigate = useNavigate();
   const [amount, setAmount] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     const value = Number(amount.replace(/,/g, ""));
     if (!value || value <= 0) return toast.error("Enter an amount greater than 0");
-    const result = fund(value);
-    if (!result.ok) {
-      pushFeed({ kind: "blocked", message: `Squad funding failed · ${result.failure.code}` });
-      toast.error(`Squad funding failed · ${result.failure.code}`);
-      navigate({ to: "/admin/transaction-failed/$ref", params: { ref: result.failure.ref } });
-      return;
+    setBusy(true);
+    try {
+      const result = await companyService.fundWallet(value);
+      if (!result.ok) {
+        pushFeed({ kind: "blocked", message: `Squad funding failed · ${result.failure.code}` });
+        toast.error(`Squad funding failed · ${result.failure.code}`);
+        navigate({ to: "/admin/transaction-failed/$ref", params: { ref: result.failure.ref } });
+        return;
+      }
+      pushFeed({ kind: "released", message: `Wallet funded · ${naira(value)}` });
+      toast.success(`Wallet funded · ${naira(value)}`);
+      setAmount("");
+    } finally {
+      setBusy(false);
     }
-    pushFeed({ kind: "released", message: `Wallet funded · ${naira(value)}` });
-    toast.success(`Wallet funded · ${naira(value)}`);
-    setAmount("");
   };
 
   return (
@@ -57,8 +63,8 @@ function WalletPage() {
               <Label htmlFor="amount">Fund amount (₦)</Label>
               <Input id="amount" inputMode="numeric" placeholder="500000" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d,]/g, ""))} />
             </div>
-            <Button onClick={submit} className="w-full">
-              <ArrowUpRight className="h-4 w-4" /> Fund via Squad
+            <Button onClick={submit} disabled={busy} className="w-full">
+              <ArrowUpRight className="h-4 w-4" /> {busy ? "Funding…" : "Fund via Squad"}
             </Button>
             <div className="flex flex-wrap gap-2">
               {[100_000, 500_000, 2_000_000, 10_000_000].map((v) => (
