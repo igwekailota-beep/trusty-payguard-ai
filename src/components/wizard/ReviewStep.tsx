@@ -29,7 +29,7 @@ export function ReviewStep() {
       message: `Squad batch executed for ${agency || "audit run"} · ${n} transfers released`,
     });
     reset();
-    navigate({ to: "/dashboard" });
+    navigate("/dashboard");
   };
 
   return (
