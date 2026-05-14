@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { StatusPill } from "@/components/common/StatusPill";
 import { ScoreBreakdown } from "@/components/common/ScoreBreakdown";
 import { MAX_SCORE, type VerificationChecks, type VerificationStatus } from "@/lib/scoring";
+import { companyService } from "@/services/api";
 import { toast } from "sonner";
 
 export function LedgerTable() {
@@ -56,9 +57,13 @@ export function LedgerTable() {
     });
   }, [employees, search, dept, statusFilter]);
 
-  const disburseOne = (e: Employee) => {
-    if (e.verificationStatus !== "verified" && !e.override) return;
-    pushFeed({ kind: "released", message: `Squad transfer released · ${naira(e.salary)} → ${e.id}` });
+  const disburseOne = async (e: Employee) => {
+    const result = await companyService.disburseToWorker(e.id);
+    if (!result.ok) {
+      toast.error(result.reason);
+      return;
+    }
+    pushFeed({ kind: "released", message: `Squad transfer released · ${naira(e.salary)} → ${e.id} · ${result.ref}` });
     toast.success(`Squad transfer released to ${e.name}`);
   };
 
