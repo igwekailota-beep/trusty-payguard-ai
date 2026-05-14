@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,10 +9,6 @@ import { useFeedStore } from "@/store/feedStore";
 import { Paperclip, Send } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/worker/appeal")({
-  head: () => ({ meta: [{ title: "Request Appeal · PayGuard Worker" }] }),
-  component: AppealPage,
-});
 
 function AppealPage() {
   const user = useAuthStore((s) => s.user);
@@ -36,7 +32,7 @@ function AppealPage() {
     });
     pushFeed({ kind: "info", message: `Appeal filed by ${user?.fullName ?? "worker"}` });
     toast.success("Appeal submitted to your administrator");
-    navigate({ to: "/worker/home" });
+    navigate("/worker/home");
   };
 
   return (
@@ -74,3 +70,5 @@ function AppealPage() {
     </div>
   );
 }
+
+export default AppealPage;

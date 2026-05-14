@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { useWizardStore } from "@/store/wizardStore";
 import { StepperHeader } from "@/components/wizard/StepperHeader";
 import { ScopeStep } from "@/components/wizard/ScopeStep";
@@ -8,16 +8,6 @@ import { ReviewStep } from "@/components/wizard/ReviewStep";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-export const Route = createFileRoute("/wizard")({
-  head: () => ({
-    meta: [
-      { title: "Pre-Flight Audit Wizard · PayGuard AI" },
-      { name: "description", content: "Run the 4-step AI-gated payroll audit wizard." },
-      { property: "og:title", content: "PayGuard AI · Pre-Flight" },
-    ],
-  }),
-  component: WizardPage,
-});
 
 function WizardPage() {
   const { step, next, back, agency, files, riskConfidence } = useWizardStore();
@@ -63,3 +53,5 @@ function WizardPage() {
     </div>
   );
 }
+
+export default WizardPage;

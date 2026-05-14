@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,6 @@ import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/admin/batches")({
-  head: () => ({ meta: [{ title: "Payroll Batches · PayGuard Admin" }] }),
-  component: BatchesPage,
-});
 
 const STATUS_COLOR: Record<BatchStatus, string> = {
   pending: "var(--status-pending)",
@@ -133,3 +129,5 @@ function BatchesPage() {
     </div>
   );
 }
+
+export default BatchesPage;

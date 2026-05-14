@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +10,6 @@ import { compactNaira, naira } from "@/lib/format";
 import { Wallet, ArrowUpRight, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/wallet")({
-  head: () => ({ meta: [{ title: "Squad Wallet · PayGuard Admin" }] }),
-  component: WalletPage,
-});
 
 function WalletPage() {
   const balance = useBatchStore((s) => s.walletBalance);
@@ -100,3 +96,5 @@ function WalletPage() {
     </div>
   );
 }
+
+export default WalletPage;

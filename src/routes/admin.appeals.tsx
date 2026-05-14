@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { useState } from "react";
 import { useAppealStore } from "@/store/appealStore";
 import { useLedgerStore } from "@/store/ledgerStore";
@@ -10,10 +10,6 @@ import { ScoreBreakdown } from "@/components/common/ScoreBreakdown";
 import { Inbox, Paperclip } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/admin/appeals")({
-  head: () => ({ meta: [{ title: "Appeals Inbox · PayGuard Admin" }] }),
-  component: AppealsPage,
-});
 
 function AppealsPage() {
   const appeals = useAppealStore((s) => s.appeals);
@@ -150,3 +146,5 @@ function AppealItem({
     </li>
   );
 }
+
+export default AppealsPage;

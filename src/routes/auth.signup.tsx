@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,6 @@ import { useAuthStore } from "@/store/authStore";
 import { Building2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/auth/signup")({
-  head: () => ({ meta: [{ title: "Create account · PayGuard AI" }] }),
-  validateSearch: (s: Record<string, unknown>) => ({ role: (s.role as string) === "company" ? "company" : "worker" }),
-  component: SignupPage,
-});
 
 function SignupPage() {
   const { role: defaultRole } = Route.useSearch();
@@ -27,13 +22,13 @@ function SignupPage() {
     if (worker.nin && worker.nin.length !== 11) return toast.error("NIN must be 11 digits");
     signup({ ...worker, role: "worker" });
     toast.success("Account created");
-    navigate({ to: "/worker/claim" });
+    navigate("/worker/claim");
   };
   const submitCompany = () => {
     if (!company.companyName || !company.email) return toast.error("Company name and email required");
     signup({ ...company, role: "company_admin" });
     toast.success("Company account created");
-    navigate({ to: "/admin/dashboard" });
+    navigate("/admin/dashboard");
   };
 
   return (
@@ -80,3 +75,5 @@ function Field({ label, value, onChange, type = "text", inputMode }: { label: st
     </div>
   );
 }
+
+export default SignupPage;

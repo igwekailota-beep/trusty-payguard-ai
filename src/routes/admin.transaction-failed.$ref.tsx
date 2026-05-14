@@ -1,13 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, useParams } from "react-router-dom";
 import { useBatchStore } from "@/store/batchStore";
 import { Button } from "@/components/ui/button";
 import { naira } from "@/lib/format";
 import { AlertTriangle, ArrowLeft, RefreshCcw } from "lucide-react";
 
-export const Route = createFileRoute("/admin/transaction-failed/$ref")({
-  head: () => ({ meta: [{ title: "Transaction Failed · PayGuard Admin" }] }),
-  component: FailurePage,
-});
 
 const FIXES: Record<string, string[]> = {
   WALLET_INSUFFICIENT: [
@@ -33,7 +29,7 @@ const FIXES: Record<string, string[]> = {
 };
 
 function FailurePage() {
-  const { ref } = Route.useParams();
+  const { ref } = useParams();
   const failure = useBatchStore((s) => s.getFailure(ref));
 
   return (
@@ -99,3 +95,5 @@ function Item({ label, value, tone }: { label: string; value: string; tone?: "da
     </div>
   );
 }
+
+export default FailurePage;

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,6 @@ import { useAuthStore } from "@/store/authStore";
 import { Building2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/auth/login")({
-  head: () => ({ meta: [{ title: "Sign in · PayGuard AI" }] }),
-  component: LoginPage,
-});
 
 function LoginPage() {
   const login = useAuthStore((s) => s.login);
@@ -68,3 +64,5 @@ function LoginPage() {
     </div>
   );
 }
+
+export default LoginPage;

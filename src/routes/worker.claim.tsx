@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,6 @@ import { workerService } from "@/services/api";
 import { CheckCircle2, AlertTriangle, Search } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/worker/claim")({
-  head: () => ({ meta: [{ title: "Claim My Record · PayGuard Worker" }] }),
-  component: ClaimPage,
-});
 
 function ClaimPage() {
   const user = useAuthStore((s) => s.user);
@@ -127,3 +123,5 @@ function Row({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+export default ClaimPage;
