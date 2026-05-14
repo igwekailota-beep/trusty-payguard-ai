@@ -81,7 +81,7 @@ export function Header() {
                 aria-label="Sign out"
                 onClick={() => {
                   logout();
-                  navigate({ to: "/" });
+                  navigate("/");
                 }}
               >
                 <LogOut className="h-4 w-4" />
