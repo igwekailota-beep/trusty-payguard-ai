@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,8 @@ import { toast } from "sonner";
 
 
 function SignupPage() {
-  const { role: defaultRole } = Route.useSearch();
+  const [searchParams] = useSearchParams();
+  const defaultRole = searchParams.get("role") === "company" ? "company" : "worker";
   const signup = useAuthStore((s) => s.signup);
   const navigate = useNavigate();
 
