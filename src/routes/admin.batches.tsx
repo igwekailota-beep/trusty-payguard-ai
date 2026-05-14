@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { useBatchStore, type BatchStatus } from "@/store/batchStore";
 import { useFeedStore } from "@/store/feedStore";
+import { companyService } from "@/services/api";
 import { naira, compactNaira } from "@/lib/format";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -23,16 +24,15 @@ const STATUS_COLOR: Record<BatchStatus, string> = {
 
 function BatchesPage() {
   const batches = useBatchStore((s) => s.batches);
-  const addBatch = useBatchStore((s) => s.addBatch);
   const advance = useBatchStore((s) => s.advanceBatch);
   const pushFeed = useFeedStore((s) => s.push);
   const [last, setLast] = useState<string | null>(null);
 
   const onDrop = useCallback((files: File[]) => {
-    files.forEach((f) => {
+    files.forEach(async (f) => {
       const workerCount = 50 + Math.floor(Math.random() * 200);
       const totalAmount = workerCount * (200_000 + Math.floor(Math.random() * 200_000));
-      const batch = addBatch({ filename: f.name, workerCount, totalAmount });
+      const batch = await companyService.uploadPayroll({ filename: f.name, workerCount, totalAmount });
       setLast(batch.id);
       toast.success(`Uploaded ${f.name}`);
       pushFeed({ kind: "info", message: `Payroll batch uploaded · ${batch.id}` });
@@ -40,7 +40,7 @@ function BatchesPage() {
       setTimeout(() => advance(batch.id), 1500);
       setTimeout(() => advance(batch.id), 3500);
     });
-  }, [addBatch, advance, pushFeed]);
+  }, [advance, pushFeed]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
