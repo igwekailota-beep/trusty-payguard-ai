@@ -29,7 +29,7 @@ const FIXES: Record<string, string[]> = {
 };
 
 function FailurePage() {
-  const { ref } = useParams();
+  const { ref = "" } = useParams<{ ref: string }>();
   const failure = useBatchStore((s) => s.getFailure(ref));
 
   return (
