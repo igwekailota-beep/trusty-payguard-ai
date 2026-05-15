@@ -1,8 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LogOut, ShieldCheck, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
+import logoMark from "@/assets/payguard-logo-mark.png";
 
 const ADMIN_NAV = [
   { to: "/admin/dashboard", label: "Decision Ledger" },
@@ -30,12 +31,7 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span
-            className="grid h-8 w-8 place-items-center rounded-md text-primary-foreground"
-            style={{ backgroundImage: "var(--gradient-primary)" }}
-          >
-            <ShieldCheck className="h-4 w-4" />
-          </span>
+          <img src={logoMark} alt="PayGuard AI logo" className="h-9 w-9 object-contain" />
           <div className="leading-tight">
             <div className="text-sm font-semibold tracking-tight">PayGuard AI</div>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
